@@ -1,0 +1,2 @@
+password,user,uid,"group1,group2"
+admin,admin,1000,system:masters

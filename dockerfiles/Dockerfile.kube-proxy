@@ -1,0 +1,22 @@
+#FROM k8s.gcr.io/kube-proxy:v1.25.7
+
+#COPY kubeconfig/kubeconfig.conf /etc/kubernetes/kubeconfig.conf
+
+#CMD ["kube-proxy", "--proxy-mode=iptables", "--kubeconfig=/etc/kubernetes/kubeconfig.conf"]
+FROM ubuntu:20.04
+
+RUN apt-get update && apt-get install -y curl
+
+# Download kube-proxy binary
+RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.25.7/bin/linux/amd64/kube-proxy -o /usr/local/bin/kube-proxy && \
+    chmod +x /usr/local/bin/kube-proxy
+
+# Copy config files
+COPY kubeconfig/kubeconfig.conf /var/lib/kube-proxy/kubeconfig.conf
+COPY kubeconfig/kube-proxy-config.yaml /var/lib/kube-proxy/config.yaml
+
+# Create the service account token directory and file
+RUN mkdir -p /var/run/secrets/kubernetes.io/serviceaccount \
+    && touch /var/run/secrets/kubernetes.io/serviceaccount/token
+
+CMD ["kube-proxy", "--config=/var/lib/kube-proxy/config.yaml"]

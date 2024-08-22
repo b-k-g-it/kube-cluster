@@ -1,0 +1,22 @@
+FROM k8s.gcr.io/kube-apiserver:v1.25.7
+
+COPY pki /etc/kubernetes/pki
+
+CMD ["kube-apiserver", \
+    "--advertise-address=0.0.0.0", \
+    "--allow-privileged=true", \
+    "--authorization-mode=Node,RBAC", \
+    "--client-ca-file=/etc/kubernetes/pki/ca.crt", \
+    "--enable-admission-plugins=NodeRestriction", \
+    "--enable-bootstrap-token-auth=true", \
+    "--etcd-servers=http://etcd:2379", \
+    "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname", \
+    "--secure-port=6443", \
+    "--service-account-issuer=https://kubernetes.default.svc.cluster.local", \
+    "--service-account-key-file=/etc/kubernetes/pki/sa.pub", \
+    "--service-account-signing-key-file=/etc/kubernetes/pki/sa.key", \
+    "--service-cluster-ip-range=10.96.0.0/12", \
+    "--tls-cert-file=/etc/kubernetes/pki/apiserver.crt", \
+    "--tls-private-key-file=/etc/kubernetes/pki/apiserver.key", \
+    "--token-auth-file=/etc/kubernetes/token.csv", \
+    "--v=4"]

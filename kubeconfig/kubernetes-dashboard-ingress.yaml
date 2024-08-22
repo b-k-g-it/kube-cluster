@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+spec:
+  rules:
+  - host: dashboard.serv.eysho.it
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              number: 8001 # Überprüfe, ob der Port korrekt ist
+  tls:
+  - hosts:
+    - dashboard.serv.eysho.it
+    secretName: kubernetes-dashboard-tls

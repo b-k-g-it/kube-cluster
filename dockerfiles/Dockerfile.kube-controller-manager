@@ -1,0 +1,14 @@
+FROM k8s.gcr.io/kube-controller-manager:v1.25.7
+
+COPY pki /etc/kubernetes/pki
+COPY kubeconfig/controller-manager.conf /etc/kubernetes/controller-manager.conf
+
+CMD ["kube-controller-manager", \
+    "--bind-address=0.0.0.0", \
+    "--cluster-cidr=10.244.0.0/16", \
+    "--cluster-name=kubernetes", \
+    "--kubeconfig=/etc/kubernetes/controller-manager.conf", \
+    "--leader-elect=true", \
+    "--root-ca-file=/etc/kubernetes/pki/ca.crt", \
+    "--service-account-private-key-file=/etc/kubernetes/pki/sa.key", \
+    "--use-service-account-credentials=true"]

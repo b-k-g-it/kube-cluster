@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+
+  etcd:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.etcd
+    networks:
+      - kubernetes-network
+
+  kube-apiserver:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-apiserver
+    networks:
+      - kubernetes-network
+    ports:
+      - "6443:6443"
+    volumes:
+      - ./pki:/etc/kubernetes/pki:ro
+      - type: bind
+        source: ./dockerfiles/token.csv
+        target: /etc/kubernetes/token.csv
+        read_only: true
+    depends_on:
+      - etcd
+
+  kube-controller-manager:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-controller-manager
+    networks:
+      - kubernetes-network
+    depends_on:
+      - kube-apiserver
+
+  kube-scheduler:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-scheduler
+    networks:
+      - kubernetes-network
+    depends_on:
+      - kube-apiserver
+
+  kube-proxy:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-proxy
+    networks:
+      - kubernetes-network
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - /proc:/proc
+      - /var/run/secrets/kubernetes.io/serviceaccount:/var/run/secrets/kubernetes.io/serviceaccount
+    depends_on:
+      - kube-apiserver
+
+networks:
+  kubernetes-network:
+    driver: bridge

@@ -1,0 +1,8 @@
+FROM k8s.gcr.io/kube-scheduler:v1.25.7
+
+COPY kubeconfig/scheduler.conf /etc/kubernetes/scheduler.conf
+
+CMD ["kube-scheduler", \
+    "--bind-address=0.0.0.0", \
+    "--kubeconfig=/etc/kubernetes/scheduler.conf", \
+    "--leader-elect=true"]

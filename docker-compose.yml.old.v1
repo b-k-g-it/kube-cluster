@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  etcd:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.etcd
+    networks:
+      - kubernetes-network
+
+  kube-apiserver:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-apiserver
+    networks:
+      - kubernetes-network
+    ports:
+      - "6443:6443"
+    environment:
+      - KUBE_ADVERTISE_ADDRESS=api.serv.eysho.it
+    volumes:
+      - ./kubeconfig:/etc/kubernetes:ro
+    command:
+      - kube-apiserver
+      - --advertise-address=0.0.0.0
+      - --allow-privileged=true
+      - --authorization-mode=Node,RBAC
+      - --client-ca-file=/etc/kubernetes/pki/ca.crt
+      - --enable-admission-plugins=NodeRestriction
+      - --enable-bootstrap-token-auth=true
+      - --etcd-servers=http://etcd:2379
+      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+      - --secure-port=6443
+      - --service-account-issuer=https://kubernetes.default.svc.cluster.local
+      - --service-account-key-file=/etc/kubernetes/pki/sa.pub
+      - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key
+      - --service-cluster-ip-range=10.96.0.0/12
+      - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
+      - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+      - --token-auth-file=/etc/kubernetes/token.csv
+    depends_on:
+      - etcd
+
+  kube-controller-manager:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-controller-manager
+    networks:
+      - kubernetes-network
+    volumes:
+      - ./kubeconfig:/etc/kubernetes:ro
+    command:
+      - kube-controller-manager
+      - --bind-address=0.0.0.0
+      - --cluster-cidr=10.244.0.0/16
+      - --cluster-name=kubernetes
+      - --kubeconfig=/etc/kubernetes/controller-manager.conf
+      - --leader-elect=true
+      - --root-ca-file=/etc/kubernetes/pki/ca.crt
+      - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+      - --use-service-account-credentials=true
+    depends_on:
+      - kube-apiserver
+
+  kube-scheduler:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-scheduler
+    networks:
+      - kubernetes-network
+    volumes:
+      - ./kubeconfig:/etc/kubernetes:ro
+    command:
+      - kube-scheduler
+      - --bind-address=0.0.0.0
+      - --kubeconfig=/etc/kubernetes/scheduler.conf
+      - --leader-elect=true
+    depends_on:
+      - kube-apiserver
+
+  kube-proxy:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.kube-proxy
+    networks:
+      - kubernetes-network
+    ports:
+      - "8001:8001"
+    environment:
+      - KUBE_PROXY_HOSTNAME=proxy.serv.eysho.it
+      - KUBERNETES_SERVICE_HOST=api.serv.eysho.it
+      - KUBERNETES_SERVICE_PORT=6443
+    volumes:
+      - ./kubeconfig:/etc/kubernetes:ro
+      - /var/run/secrets/kubernetes.io/serviceaccount:/var/run/secrets/kubernetes.io/serviceaccount
+    command:
+      - kube-proxy
+      - --config=/etc/kubernetes/kube-proxy-config.yaml
+    depends_on:
+      - kube-apiserver
+
+networks:
+  kubernetes-network:
+    driver: bridge

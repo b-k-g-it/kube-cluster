@@ -1,0 +1,16 @@
+Zusammengefasste Fehler und Warnungen:
+======================================
+
+Fehler und Warnungen für kube-apiserver:
+-------------------------------------
+
+Fehler und Warnungen für kube-controller-manager:
+-------------------------------------
+
+Fehler und Warnungen für kube-scheduler:
+-------------------------------------
+
+Fehler und Warnungen für kube-proxy:
+-------------------------------------
+kube-proxy-1  | E0822 16:18:54.062285       1 server.go:500] "Error running ProxyServer" err="open /var/run/secrets/kubernetes.io/serviceaccount/token: no such file or directory"
+

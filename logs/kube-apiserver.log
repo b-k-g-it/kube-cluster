@@ -1,0 +1,10 @@
+time="2024-08-22T18:19:08+02:00" level=warning msg="/opt/stacks/docker-compose-kubernetes/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+kube-apiserver-1  | 2024/08/22 16:18:53 Running command:
+kube-apiserver-1  | Command env: (log-file=, also-stdout=false, redirect-stderr=true)
+kube-apiserver-1  | Run from directory: 
+kube-apiserver-1  | Executable path: /usr/local/bin/kube-apiserver
+kube-apiserver-1  | Args (comma-delimited): kube-apiserver,--advertise-address=0.0.0.0,--allow-privileged=true,--authorization-mode=Node,RBAC,--client-ca-file=/etc/kubernetes/pki/ca.crt,--enable-admission-plugins=NodeRestriction,--enable-bootstrap-token-auth=true,--etcd-servers=http://etcd:2379,--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname,--secure-port=6443,--service-account-issuer=https://kubernetes.default.svc.cluster.local,--service-account-key-file=/etc/kubernetes/pki/sa.pub,--service-account-signing-key-file=/etc/kubernetes/pki/sa.key,--service-cluster-ip-range=10.96.0.0/12,--tls-cert-file=/etc/kubernetes/pki/apiserver.crt,--tls-private-key-file=/etc/kubernetes/pki/apiserver.key,--token-auth-file=/etc/kubernetes/token.csv
+kube-apiserver-1  | 2024/08/22 16:18:53 Now listening for interrupts
+kube-apiserver-1  | I0822 16:18:53.591148      11 server.go:563] external host was not specified, using 172.18.0.3
+kube-apiserver-1  | E0822 16:18:53.591199      11 run.go:74] "command failed" err="failed to parse service-account-issuer-key-file: open /etc/kubernetes/pki/sa.key: no such file or directory"
+kube-apiserver-1  | 2024/08/22 16:18:53 running command: exit status 1
